@@ -151,7 +151,7 @@ int AppRunWizard(AppWizards *app, void *pstOption)
 
     if (addRunWizard(app->szWizardName))
     {
-        printf("failed: there is another same named (%s) wizard\n",
+        printf("failed: there is another same wizard named (%s)\n",
                app->szWizardName);
         return -1;
     }
