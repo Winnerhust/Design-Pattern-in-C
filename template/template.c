@@ -7,16 +7,14 @@
 
 typedef int (*WizardsStep)(void *pstOption);
 
-typedef struct
-{
+typedef struct {
     char szWizardName[32];
     WizardsStep steps[MAX_STEP_NUM];
 } AppWizards;
 
 char g_szWizardNameList[MAX_RUN_WIZARD_NUM][32];
 
-typedef struct
-{
+typedef struct {
     char *szAppName;
     int keeppkg;
 } AppWizardsOptions;
@@ -120,7 +118,10 @@ int addRunWizard(char *pszWizardName)
     {
         if (g_szWizardNameList[i][0] == '\0')
         {
-            strcpy(g_szWizardNameList[i], pszWizardName);
+            snprintf(g_szWizardNameList[i],
+                     sizeof(g_szWizardNameList[i]),
+                     "%s",
+                     pszWizardName);
             return 0;
         }
     }
@@ -172,7 +173,9 @@ int AppRunWizard(AppWizards *app, void *pstOption)
     return 0;
 }
 
-void AppWizardsOptionInit(AppWizardsOptions *option, char *pszAppName, int keeppkg)
+void AppWizardsOptionInit(AppWizardsOptions *option,
+                          char *pszAppName,
+                          int keeppkg)
 {
     option->szAppName = pszAppName;
     option->keeppkg = keeppkg;
@@ -185,36 +188,32 @@ int main(int argc, char *argv[])
     AppWizards w;
     AppWizardsOptions o;
     char *pszAppName;
-    if (argc < 3)
-    {
+    if (argc < 3) {
         printf("usage: %s {e|i|f|d} appname\n", argv[0]);
         return 1;
     }
     pszAppName = argv[2];
 
-    if (argv[1][0] == 'e')
-    {
+    if (argv[1][0] == 'e') {
         AppEasyInstallWizardsInit(&w, pszAppName);
         AppWizardsOptionInit(&o, pszAppName, 1);
-    }
-    else if (argv[1][0] == 'i')
-    {
+    } else if (argv[1][0] == 'i') {
         AppInstallWizardsInit(&w, pszAppName);
         AppWizardsOptionInit(&o, pszAppName, 1);
-    }
-    else if (argv[1][0] == 'f')
-    {
+    } else if (argv[1][0] == 'f') {
         AppFastInstallWizardsInit(&w, pszAppName);
         AppWizardsOptionInit(&o, pszAppName, 1);
-    }
-    else
-    {
+    } else {
         AppDownLoadWizardsInit(&w, pszAppName);
         AppWizardsOptionInit(&o, pszAppName, 1);
     }
 
     // 模拟多个向导程序运行时，同名的向导只能运行一个
-    strcpy(g_szWizardNameList[0], "app1");
+    // 因此，输入app1时会提示有同名的向导程序
+    // 输入其他名称的向导程序则能正常运行
+    snprintf(g_szWizardNameList[0],
+             sizeof(g_szWizardNameList[0]),
+             "%s", "app1");
 
     AppRunWizard(&w, &o);
 
